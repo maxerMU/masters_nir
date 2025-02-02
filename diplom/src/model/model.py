@@ -14,8 +14,10 @@ class PageAccModel(nn.Module):
         
         self._page_acc_enc = nn.Sequential(
             nn.Linear(page_params, 256),
+            nn.BatchNorm1d(256),
             nn.ReLU(),
             nn.Linear(256, hidden_size),
+            nn.BatchNorm1d(hidden_size),
             nn.ReLU(),
         )
 
@@ -23,16 +25,19 @@ class PageAccModel(nn.Module):
         
         self._buf_page_enc = nn.Sequential(
             nn.Linear(page_params * buf_size, 128),
+            nn.BatchNorm1d(128),
             nn.ReLU(),
             nn.Linear(128, hidden_size * buf_size),
+            nn.BatchNorm1d(hidden_size * buf_size),
             nn.ReLU(),
         )
 
         self._page_evict = nn.Sequential(
             nn.Linear(lstm_hidden_size + hidden_size * buf_size, 512),
+            nn.BatchNorm1d(512),
             nn.ReLU(),
             nn.Linear(512, buf_size),
-            nn.ReLU()
+            # nn.ReLU()
             # nn.Softmax(dim=1)
         )
 
