@@ -11,7 +11,7 @@ class PageAccModel(nn.Module):
         self._hidden_size = hidden_size
         self._lstm_hidden_size = lstm_hidden_size
         self._buf_size = buf_size
-        
+
         self._page_acc_enc = nn.Sequential(
             nn.Linear(page_params, 256),
             nn.BatchNorm1d(256),
@@ -22,12 +22,12 @@ class PageAccModel(nn.Module):
         )
 
         self._lstm = nn.LSTM(input_size=hidden_size, hidden_size=lstm_hidden_size, batch_first=True)
-        
+
         self._buf_page_enc = nn.Sequential(
-            nn.Linear(page_params * buf_size, 128),
-            nn.BatchNorm1d(128),
+            nn.Linear(page_params * buf_size, 512),
+            nn.BatchNorm1d(512),
             nn.ReLU(),
-            nn.Linear(128, hidden_size * buf_size),
+            nn.Linear(512, hidden_size * buf_size),
             nn.BatchNorm1d(hidden_size * buf_size),
             nn.ReLU(),
         )
@@ -62,7 +62,7 @@ class PageAccModel(nn.Module):
             lstm_out, (hn, cn) = self._lstm(lstm_input, (h0, c0))
 
         lstm_out_flat = lstm_out.view(lstm_out.shape[0], lstm_out.shape[2])
-        
+
         buf_page_out = self._buf_page_enc(buf_pages)
 
         # for i in range(len(lstm_out)):
@@ -79,5 +79,5 @@ class PageAccModel(nn.Module):
         res = self._page_evict(page_evict_input)
 
         # self._trace_file.write("//////////////////////////////////////////////\nn")
-        
+
         return res, hn, cn
