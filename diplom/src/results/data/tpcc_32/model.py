@@ -51,7 +51,7 @@ class PageAccModel(nn.Module):
         nn.init.orthogonal_(self._lstm.weight_hh_l0)
         nn.init.kaiming_normal_(self._lstm.weight_ih_l0)
 
-    def forward(self, page_params, buf_pages, h0=None, c0=None):
+    def forward(self, page_params, buf_pages, page_already_in_buf, h0=None, c0=None):
         # self._trace_file.write("//////////////////////////////////////////////\nn")
         page_acc_enc = self._page_acc_enc(page_params)
 
@@ -60,6 +60,9 @@ class PageAccModel(nn.Module):
             lstm_out, (hn, cn) = self._lstm(lstm_input)
         else:
             lstm_out, (hn, cn) = self._lstm(lstm_input, (h0, c0))
+        
+        if page_already_in_buf:
+            return None, hn, cn
 
         lstm_out_flat = lstm_out.view(lstm_out.shape[0], lstm_out.shape[2])
         
