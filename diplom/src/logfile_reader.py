@@ -54,7 +54,7 @@ def read_pages(filepath: str):
             # is_local_temp, 
             fork_num,
             block_num,
-            #mode,
+            # mode,
             relam,
             relfilenode,
             relhasindex,
