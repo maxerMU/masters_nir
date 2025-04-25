@@ -1,0 +1,201 @@
+\chapter{Исследовательский раздел}
+
+\section{Подбор параметров сети}
+\section{Сравнение с аналогами}
+%\section{Сравнение методов оптимизации}
+
+
+%TODO check graphics
+%\begin{figure}[H]
+%	\begin{center}
+%		\begin{tikzpicture}
+%		\begin{axis}[
+%		xlabel = {номер эпохи},
+%		ylabel = {точность},
+%		legend pos=south east,
+%		ymajorgrids=true,
+%		width=12cm
+%		]   
+%		\addplot[color=blue, mark=square] table[x index=0, y index=1] {inc/data/adam_train.dat};
+%		
+%		\addplot[color=red, mark=*] table[x index=0, y index=1] {inc/data/rmsprop_train.dat};
+%		
+%		
+%		\addlegendentry{ADAM}
+%		\addlegendentry{RMSProps}
+%		
+%		\end{axis}
+%		\end{tikzpicture}
+%		\caption{Сравнение моделей, обученных на RMPSProp и ADAM, на тренировочной выборке}
+%		\label{img:adam_rmsprops_training}
+%	\end{center}
+%\end{figure}
+%\begin{figure}[H]
+%	\begin{center}
+%		\begin{tikzpicture}
+%		\begin{axis}[
+%		xlabel = {номер эпохи},
+%		ylabel = {точность},
+%		legend pos=south east,
+%		ymajorgrids=true,
+%		width=12cm
+%		]   
+%		\addplot[color=blue, mark=square] table[x index=0, y index=1] {inc/data/adam_test.dat};
+%		
+%		\addplot[color=red, mark=*] table[x index=0, y index=1] {inc/data/rmsprop_test.dat};
+%		
+%		
+%		\addlegendentry{ADAM}
+%		\addlegendentry{RMSProps}
+%		
+%		\end{axis}
+%		\end{tikzpicture}
+%		\caption{Сравнение моделей, обученных на RMPSProp и ADAM, на тестовой выборке}
+%		\label{img:adam_rmsprops_test}
+%	\end{center}
+%\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		xlabel = {номер эпохи},
+		ylabel = {значение функции потерь},
+		legend pos=south west,
+		ymajorgrids=true,
+		width=12cm
+		]   
+		\addplot[color=blue, mark=square] table[x index=0, y index=1] {inc/data/loss_adam.dat};
+		
+		\addplot[color=red, mark=*] table[x index=0, y index=1] {inc/data/loss_rms.dat};
+		
+		
+		\addlegendentry{Adam}
+		\addlegendentry{RMSProps}
+		
+		\end{axis}
+		\end{tikzpicture}
+		\caption{Сравнение функций потерь моделей, обученных на RMPSProp и Adam}
+		\label{img:adam_rmsprops_test}
+	\end{center}
+\end{figure}
+
+Из графиков видно, что функция потерь, которая оптимизировалась с помощью алгоритма Adam сходится быстрее и не попадает в локальные минимумы. Итоговая точность модели, которая обучалась с помощью алгоритма Adam, составила 84 процента на тестовой выборке.
+
+%\section{Модификация модели классификации}
+
+После каждого из слоев пуллинга в архитектуре модели классификации был добавлен слой дропаут, который с некоторой заданной вероятностью $p$ исключает нейрон из обучения на одну итерацию. Такой прием приводит к тому, что модель обучается на разных комбинациях активных нейронов, что уменьшает вероятность переобучения модели.
+
+Графики зависимости точности модели на тестовой выборке от номера эпохи обучения с использованием dropout и без приведены на рисунке \ref{img:dropout_test}.
+
+\begin{figure}[H]
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		xlabel = {номер эпохи},
+		ylabel = {точность},
+		legend pos=south east,
+		ymajorgrids=true,
+		width=12cm
+		]   
+		\addplot[color=blue, mark=square] table[x index=0, y index=1] {inc/data/model_test.dat};
+		
+		\addplot[color=red, mark=*] table[x index=0, y index=1] {inc/data/adam_test_no_drop.dat};
+		
+		
+		\addlegendentry{с dropout}
+		\addlegendentry{без dropout}
+		
+		\end{axis}
+		\end{tikzpicture}
+		\caption{Сравнение моделей, обученных с использованием dropout и без, на тестовой выборке}
+		\label{img:dropout_test}
+	\end{center}
+\end{figure}
+
+Из графиков видно, что после 6 эпохи обучения, модель которая обучалась без использования dropout стала обучаться на шум на тренировочной выборке, в связи с чем точность модели на тестовой выборке начала падать.
+
+Помимо добавления слоев дропаута из архитектуры сети был убран один из сверточных слоев. Точность модели на тестовой выборке после этого осталась прежней, а число обучаемых параметров было уменьшено на 600 тысяч. Уменьшение число обучаемых параметров увеличивает скорость обучения сети, снижает ограничения на вычислительные ресурсы, а также уменьшает вероятность переобучения модели.
+
+%\section{Использование Yolo для классификации}
+
+\begin{figure}[H]
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				xlabel = {номер эпохи},
+				ylabel = {точность},
+				legend pos=south east,
+				ymajorgrids=true,
+				width=12cm
+				]   
+				\addplot[color=blue, mark=square] table[x index=0, y index=1] {inc/data/yolov3_precision.dat};
+				
+				\addplot[color=red, mark=*] table[x index=0, y index=1] {inc/data/yolov3_recall.dat};
+				
+				
+				\addlegendentry{precision}
+				\addlegendentry{recall}
+				
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Precision и recall yolov3}
+		\label{img:yolov3_precision_recall}
+	\end{center}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				xlabel = {номер эпохи},
+				ylabel = {точность},
+				legend pos=south east,
+				ymajorgrids=true,
+				width=12cm
+				]   
+				\addplot[color=blue, mark=square] table[x index=0, y index=1] {inc/data/yolov7_precision.dat};
+				
+				\addplot[color=red, mark=*] table[x index=0, y index=1] {inc/data/yolov7_recall.dat};
+				
+				
+				\addlegendentry{precision}
+				\addlegendentry{recall}
+				
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Precision и recall yolov7}
+		\label{img:yolov7_precision_recall}
+	\end{center}
+\end{figure}
+
+\begin{figure}[H]
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				xlabel = {номер эпохи},
+				ylabel = {точность},
+				legend pos=south east,
+				ymajorgrids=true,
+				width=12cm
+				]   
+				\addplot[color=blue, mark=square] table[x index=0, y index=1] {inc/data/yolo_classification.dat};
+								
+				
+				\addlegendentry{классификация yolo}
+				
+			\end{axis}
+		\end{tikzpicture}
+		\caption{Сравнение моделей, обученных с использованием dropout и без, на тестовой выборке}
+		\label{img:dropout_test}
+	\end{center}
+\end{figure}
+
+
+\section{Вывод}
+В архитектуру нейронной сети были внесены изменения, которые увеличивают скорость обучения модели, снижают ограничения на вычислительные ресурсы, а также решают проблему переобучения модели.
+
+При сравнении различных оптимизаторов было выяснено, что скорость обучения сети должна адаптивно настраиваться в зависимости от текущего значения ошибки по правилу: чем больше ошибка, тем больше скорость обучения. В ином случае модель может дольше сходиться при малом значении скорости обучения, либо расходиться при больших значениях этого параметра.
+
+Алгоритмы Adam и RMSProps используются для адаптивной настройки скорости обучения. В RMSprops учитывается экспоненциальное скользящее среднее по квадрату градиента для учета истории обучения при обновлении весов модели. В алгоритме Adam также учитывается экспоненциальное скользящее среднее и по первому моменту, что позволяет ему достичь большей сходимости при обучении модели.
+
+Таким образом, разработанный метод показывает наибольшую точность при обучении моделей с помощью алгоритма Adam.
