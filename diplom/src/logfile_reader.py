@@ -1,4 +1,4 @@
-from dataclasses import dataclass, fields, asdict
+from dataclasses import dataclass
 import re
 
 @dataclass
@@ -9,14 +9,14 @@ class Page:
     fork_num: int
     block_num: int
     # mode: int
-    relam: int
+    # relam: int
     relfilenode: int
-    relhasindex: int
+    # relhasindex: int
     # relpersistence: int
     relkind: int
-    relnatts: int
-    relfrozenxid: int
-    relminmxid: int
+    # relnatts: int
+    # relfrozenxid: int
+    # relminmxid: int
     hit: int 
 
     def get_page_id(self) -> str:
@@ -54,15 +54,15 @@ def read_pages(filepath: str):
             # is_local_temp, 
             fork_num,
             block_num,
-            # mode,
-            relam,
+            #mode,
+            # relam,
             relfilenode,
-            relhasindex,
+            # relhasindex,
             # relpersistence,
             relkind,
-            relnatts,
-            relfrozenxid,
-            relminmxid,
+            # relnatts,
+            # relfrozenxid,
+            # relminmxid,
             hit,
         )
         pages.append(page)
