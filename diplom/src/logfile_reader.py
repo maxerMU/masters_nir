@@ -10,7 +10,7 @@ class Page:
     block_num: int
     # mode: int
     # relam: int
-    relfilenode: int
+    # relfilenode: int
     # relhasindex: int
     # relpersistence: int
     relkind: int
@@ -56,7 +56,7 @@ def read_pages(filepath: str):
             block_num,
             #mode,
             # relam,
-            relfilenode,
+            # relfilenode,
             # relhasindex,
             # relpersistence,
             relkind,
