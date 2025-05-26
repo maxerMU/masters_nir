@@ -1,29 +1,15 @@
-# %%
 from abc import ABC, abstractmethod
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 import torch
 
-from config import *
+import config
 from dataset import create_empty_pages_batch, page_to_batch
 from model.model import PageAccModel
 from logfile_reader import read_pages, read_optimal_results, Page
 
-# %%
-# RESULTS_DIR = "results/data/tpcc_128/"
 
-# %%
-pages = read_pages("train_data/tpcc_logfile")
-print(len(pages))
-train_size = int(len(pages) * TRAIN_PART)
-test_size = len(pages) - train_size
-# train_pages = pages[:train_size]
-# train_victims = read_optimal_results("train_data/tpcc_logfile_train_victims")
-test_pages = pages[train_size:]
-test_victims = read_optimal_results("train_data/tpcc_logfile_test_victims")
-
-# %%
 class IPageVictimStrategy(ABC):
     @abstractmethod
     def forward(page: Page, buffer: list[Page], expected_victim: int):
@@ -33,9 +19,8 @@ class IPageVictimStrategy(ABC):
         page_in_buffer = next(filter(lambda x: x[1].get_page_id() == page.get_page_id(), enumerate(buffer)), None)
         return page_in_buffer[0] if page_in_buffer else None
 
-# %%
 def get_matches(pages: list[Page], victims: list[list[int]], evict_strategy: IPageVictimStrategy):
-    buffer = [Page(0, 0, 0, 0, 0)] * BUFFER_SIZE
+    buffer = [Page(0, 0, 0, 0, 0)] * config.BUFFER_SIZE
 
     matches = 0
     hits = 0
@@ -58,11 +43,10 @@ def get_matches(pages: list[Page], victims: list[list[int]], evict_strategy: IPa
         if i % 1000 == 0:
             pbar.set_postfix_str(f"match_rate={match_rates[-1]}")
     
-    return match_rates
+    return match_rates, buffer
 
-# %%
 def get_hits(pages: list[Page], evict_strategy: IPageVictimStrategy):
-    buffer = [Page(0, 0, 0, 0, 0)] * BUFFER_SIZE
+    buffer = [Page(0, 0, 0, 0, 0)] * config.BUFFER_SIZE
 
     hits = 0
     hit_rates = []
@@ -94,12 +78,14 @@ def get_hits(pages: list[Page], evict_strategy: IPageVictimStrategy):
 #     
 #     return hit_rates
 
-# %%
 class ModelVictimStrategy(IPageVictimStrategy):
     def __init__(self, epoch):
         # self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self._device = "cpu"
-        self._model = PageAccModel(MODEL_HIDDEN_SIZE, MODEL_LSTM_HIDDEN_SIZE, BUFFER_SIZE).to(self._device)
+        self._model = PageAccModel(
+            config.MODEL_HIDDEN_SIZE,
+            config.MODEL_LSTM_HIDDEN_SIZE,
+            config.BUFFER_SIZE).to(self._device)
         self._model.load_state_dict(torch.load(f"trained_models/model_{epoch}.pth", map_location=self._device, weights_only=True))
         self._model.eval()
 
@@ -145,7 +131,7 @@ class ModelVictimStrategy(IPageVictimStrategy):
 class LRUStrategy(IPageVictimStrategy):
     def __init__(self):
         self._current_iter = 0
-        self._buffer_pos_last_acc = [0] * BUFFER_SIZE
+        self._buffer_pos_last_acc = [0] * config.BUFFER_SIZE
 
     def forward(self, page: Page, buffer: list[Page], expected_victim: int):
         self._current_iter += 1
@@ -166,7 +152,7 @@ class LRUStrategy(IPageVictimStrategy):
 class ClockSweepStrategy(IPageVictimStrategy):
     def __init__(self):
         self._current_item = 0
-        self._buffer_pos_acc = [0] * BUFFER_SIZE
+        self._buffer_pos_acc = [0] * config.BUFFER_SIZE
 
     def forward(self, page: Page, buffer: list[Page], expected_victim: int):
         page_pos = self.get_page_pos(page, buffer)
@@ -200,26 +186,33 @@ class OptimalStrategy(IPageVictimStrategy):
         return -1
 
 
+if __name__ == "__main__":
+    pages = read_pages("train_data/tpcc_logfile")
+    print(len(pages))
+    train_size = int(len(pages) * config.TRAIN_PART)
+    test_size = len(pages) - train_size
+    # train_pages = pages[:train_size]
+    # train_victims = read_optimal_results("train_data/tpcc_logfile_train_victims")
+    test_pages = pages[train_size:]
+    test_victims = read_optimal_results("train_data/tpcc_logfile_test_victims")
 
-# strategy = ModelVictimStrategy(28)
-strategy = LRUStrategy()
-# strategy = ClockSweepStrategy()
-# strategy = OptimalStrategy(test_victims)
-# hit_rates = get_hits(test_pages, strategy)
-# hit_rates = get_pg_hits(test_pages)
-matches = get_matches(test_pages, test_victims, strategy)
+    # strategy = ModelVictimStrategy(28)
+    strategy = LRUStrategy()
+    # strategy = ClockSweepStrategy()
+    # strategy = OptimalStrategy(test_victims)
+    # hit_rates = get_hits(test_pages, strategy)
+    # hit_rates = get_pg_hits(test_pages)
+    matches = get_matches(test_pages, test_victims, strategy)
 
-# %%
-# for i in range(349, 370, 5):
-#     print(f"epoch {i}")
-# 
-#     model_evict_strategy = ModelVictimStrategy()
-# 
-#     hit_rates = get_hits(test_pages, model_evict_strategy)
-#     match_rates = get_matches(train_pages, train_victims, model_evict_strategy)
+    # for i in range(349, 370, 5):
+    #     print(f"epoch {i}")
+    # 
+    #     model_evict_strategy = ModelVictimStrategy()
+    # 
+    #     hit_rates = get_hits(test_pages, model_evict_strategy)
+    #     match_rates = get_matches(train_pages, train_victims, model_evict_strategy)
 
-# %%
-with open("lru_match_results", "w") as f:
-    for rate in matches:
-        f.write(f"{rate}\n")
+    with open("lru_match_results", "w") as f:
+        for rate in matches:
+            f.write(f"{rate}\n")
 

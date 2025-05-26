@@ -1,5 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import re
+import json
 
 @dataclass
 class Page:
@@ -73,6 +74,18 @@ def save_pages_accs(filepath: str, pages: list[Page]):
     with open(filepath, "w") as f:
         for page in pages:
             f.write(f"{page.get_page_id()}\n")
+
+def save_pages_accs_to_json(filepath: str, pages: list[Page]):
+    res = json.dumps([asdict(page) for page in pages])
+    with open(filepath, "w") as f:
+        f.write(res)
+
+def load_pages_from_json(filepath: str) -> list[Page]:
+    with open(filepath) as f:
+        data = json.load(f)
+        pages = [Page(**item) for item in data]
+
+    return pages
 
 def read_optimal_results(filepath: str):
     optimal_results = []

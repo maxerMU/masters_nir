@@ -1,0 +1,47 @@
+\documentclass{bmstu}
+
+\bibliography{biblio}
+
+\setlist[itemize]{label={---}}
+\setlist[enumerate,2]{label=\arabic*), ref=\arabic*)}
+
+\usepackage{enumitem}
+%\setlist{nosep}
+%\setlist{nolistsep}
+
+
+\titlespacing*{\section}
+{0pt}{5.5ex plus 1ex minus .2ex}{4.3ex plus .2ex}
+\titlespacing*{\subsection}
+{0pt}{5.5ex plus 1ex minus .2ex}{4.3ex plus .2ex}
+
+\begin{document}
+
+\makeresearchtitle
+{Информатика и системы управления} % Название факультета
+{Программное обеспечение ЭВМ и информационные технологии} % Название кафедры
+{Исследование метода замещения страниц в разделяемом кэш буфере postgres} % Тема работы
+{Мицевич~М.~Д./ИУ7-43М} % Номер группы/ФИО студента (если авторов несколько, их необходимо разделить запятой)
+{Тассов~К.~Л.} % ФИО научного руководителя
+{} % ФИО консультанта (необязательный аргумент; если консультантов несколько, их необходимо разделить запятой)
+
+
+\include{00-essay}
+
+\maketableofcontents
+
+%\include{01-definitions}
+%\include{02-abbreviations}
+
+\include{03-introduction}
+\include{04-analysis}
+%\include{05-design}
+%\include{06-implementation}
+%\include{07-research}
+\include{08-conclusion}
+
+\makebibliography
+
+%\include{09-appendix}
+
+\end{document}
