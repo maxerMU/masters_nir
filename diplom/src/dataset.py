@@ -30,23 +30,23 @@ def int_to_binary_tensor(x: int, bits: int = 32) -> torch.Tensor:
     return torch.tensor(binary_list, dtype=torch.float32)
 
 def page_to_batch(page: Page, i: int, pos_in_buf: int, page_batch: PageBatch):
-    assert(len(fields(PageBatch)) == 6)
+    assert(len(fields(PageBatch)) == 5)
 
     page_batch.rel_id[i] = page.rel_id
     page_batch.fork_num[i] = page.fork_num
     page_batch.block_num[i] = page.block_num
-    page_batch.relfilenode[i] = page.relfilenode
+    # page_batch.relfilenode[i] = page.relfilenode
     page_batch.rel_kind[i] = page.relkind
     page_batch.position[i] = pos_in_buf
 
 def create_empty_pages_batch(batch_size, buffer_size):
-    page_accs = PageBatch(rel_id=torch.empty(batch_size, dtype=torch.int), fork_num=torch.empty(batch_size, dtype=torch.int), block_num=torch.empty(batch_size, dtype=torch.int), relfilenode=torch.empty(batch_size, dtype=torch.int), rel_kind=torch.empty(batch_size, dtype=torch.int), position=torch.empty(batch_size, dtype=torch.int))
-    buffers = [PageBatch(rel_id=torch.empty(batch_size, dtype=torch.int), fork_num=torch.empty(batch_size, dtype=torch.int), block_num=torch.empty(batch_size, dtype=torch.int), relfilenode=torch.empty(batch_size, dtype=torch.int), rel_kind=torch.empty(batch_size, dtype=torch.int), position=torch.empty(batch_size, dtype=torch.int)) for _ in range(buffer_size)]
+    page_accs = PageBatch(rel_id=torch.empty(batch_size, dtype=torch.int), fork_num=torch.empty(batch_size, dtype=torch.int), block_num=torch.empty(batch_size, dtype=torch.int), rel_kind=torch.empty(batch_size, dtype=torch.int), position=torch.empty(batch_size, dtype=torch.int))
+    buffers = [PageBatch(rel_id=torch.empty(batch_size, dtype=torch.int), fork_num=torch.empty(batch_size, dtype=torch.int), block_num=torch.empty(batch_size, dtype=torch.int), rel_kind=torch.empty(batch_size, dtype=torch.int), position=torch.empty(batch_size, dtype=torch.int)) for _ in range(buffer_size)]
 
     return page_accs, buffers
 
 def save_train_data(pages, optimal_results, dir: str):
-    buffer = [Page(0, 0, 0, 0, 0, 0)] * BUFFER_SIZE
+    buffer = [Page(0, 0, 0, 0, 0)] * BUFFER_SIZE
 
     page_accs, buffers = create_empty_pages_batch(len(pages), len(buffer))
     optimal_predictions = []
@@ -66,7 +66,7 @@ def save_train_data(pages, optimal_results, dir: str):
 
         if page_missed:
             buffer[victim] = page
-
+        
     optimal_predictions = torch.argmax(torch.Tensor(optimal_predictions), dim=1)
     hit_fail_mask = torch.tensor(hit_fail_mask, dtype=torch.bool)
 
@@ -94,19 +94,18 @@ def load_train_data(dir: str):
     return page_accs, buffers, optimal_predictions, hit_fail_mask
 
 if __name__ == "__main__":
-    pages = read_pages("train_data/tpcc_logfile")
+    pages = read_pages(DATASET)
     train_size = int(len(pages) * TRAIN_PART)
-    # train_pages = pages[:train_size]
+    train_pages = pages[:train_size]
     test_pages = pages[train_size:]
     del pages
 
-    # %%
-    # optimal_results = read_optimal_results("train_data/tpcc_logfile_train_victims")
-    optimal_results = read_optimal_results("train_data/tpcc_logfile_test_victims")
+    optimal_results_train = read_optimal_results(DATASET_TRAINT_OPT)
+    optimal_results_test = read_optimal_results(DATASET_TEST_OPT)
 
-    # %%
     # assert(len(optimal_results) == len(train_pages))
+    print(len(train_pages))
     print(len(test_pages))
 
-    # save_train_data(train_pages, optimal_results, "train_data")
-    save_train_data(test_pages, optimal_results, "test_data")
+    save_train_data(train_pages, optimal_results_train, f"{TRAIN_DATA_FOLDER}")
+    save_train_data(test_pages, optimal_results_test, f"{TEST_DATA_FOLDER}")
