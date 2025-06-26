@@ -6,8 +6,20 @@
 \setlist[enumerate,2]{label=\arabic*), ref=\arabic*)}
 
 \usepackage{enumitem}
-%\setlist{nosep}
-%\setlist{nolistsep}
+
+% настройка точек в содержании
+\makeatletter
+% Настройка плотности точек
+\renewcommand{\@dotsep}{1.5} 
+
+% Для глав
+\renewcommand*\l@chapter[2]{%
+	\@dottedtocline{0}{0em}{1.5em}{\bfseries #1}{#2}}
+
+% Для разделов
+\renewcommand*\l@section{\@dottedtocline{1}{1.5em}{2.3em}}
+\renewcommand*\l@subsection{\@dottedtocline{2}{3.8em}{3.2em}}
+\renewcommand*\l@subsubsection{\@dottedtocline{3}{7.0em}{4.1em}}
 
 \titlespacing*{\section}
 {0pt}{5.5ex plus 1ex minus .2ex}{4.3ex plus .2ex}
@@ -15,6 +27,16 @@
 {0pt}{5.5ex plus 1ex minus .2ex}{4.3ex plus .2ex}
 
 \begin{document}
+
+
+\makethesistitle
+{Информатика и системы управления} % Название факультета
+{Программное обеспечение ЭВМ и информационные технологии} % Название кафедры
+{Метод замещения страниц в разделяемом кэш буфере Postgres с использованием нейронных сетей} % Тема работы
+{Мицевич~М.~Д./ИУ7-43М} % Номер группы/ФИО студента (если авторов несколько, их необходимо разделить запятой)
+{Тассов~К.~Л.} % ФИО научного руководителя
+{} % ФИО консультанта (необязательный аргумент; если консультантов несколько, их необходимо разделить запятой)
+{Мальцева~Д.~Ю.} % ФИО нормоконтролера
 
 \include{00-essay}
 

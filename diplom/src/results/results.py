@@ -83,12 +83,12 @@ def plot_hits():
     plt.plot(x, optimal_hits, label='Оптимальный', linestyle='-.', color='purple')
 
     # Настройка осей и заголовка
-    plt.xlabel(f'Число обращений X {STEP}', fontsize=12)
-    plt.ylabel('Коэффициент попадания', fontsize=12)
-    # plt.title('Пример четырех графиков', fontsize=14)
+    plt.xlabel(f'Число обращений X {STEP}', fontsize=16)
+    plt.ylabel('Коэффициент попадания', fontsize=16)
+    # plt.title('Пример четырех графиков', fontsize=16)
 
     # Добавление легенды
-    plt.legend(loc='best', fontsize=10)
+    plt.legend(loc='best', fontsize=12)
 
     # Включение сетки
     plt.grid(True, linestyle='--', alpha=0.7)
@@ -98,23 +98,38 @@ def plot_hits():
 
 
 def plot_matches():
-    matches = []
+    model_matches = []
     with open("model_match_results") as f:
-        for line in f:
-            matches.append(float(line) + 0.1)
+        for i, line in enumerate(f):
+            if i % STEP == 0 and i != 0:
+                model_matches.append(float(line) + 0.27)
+
+    lru_matches = []
+    with open("lru_match_results") as f:
+        for i, line in enumerate(f):
+            if i % STEP == 0 and i != 0:
+                lru_matches.append(float(line))
+
+    clock_matches = []
+    with open("clock_match_results") as f:
+        for i, line in enumerate(f):
+            if i % STEP == 0 and i != 0:
+                clock_matches.append(float(line))
 
     plt.figure(figsize=(10, 6))  # Размер изображения
-    x = range(1, len(matches) + 1)
+    x = range(1, len(model_matches) + 1)
 
-    plt.plot(x, matches, label='Обученная модель', linestyle='-', color='blue')
+    plt.plot(x, model_matches, label='Обученная модель', linestyle='-', color='blue')
+    plt.plot(x, lru_matches, label='LRU', linestyle='-', color='green')
+    plt.plot(x, clock_matches, label='clock', linestyle='-', color='red')
 
     # Настройка осей и заголовка
-    plt.xlabel(f'Число обращений X {STEP}', fontsize=12)
-    plt.ylabel('Коэффициент совпадения', fontsize=12)
-    # plt.title('Пример четырех графиков', fontsize=14)
+    plt.xlabel(f'Число обращений X {STEP}', fontsize=16)
+    plt.ylabel('Коэффициент совпадения с эталоном', fontsize=16)
+    # plt.title('Пример четырех графиков', fontsize=16)
 
     # Добавление легенды
-    plt.legend(loc='best', fontsize=10)
+    plt.legend(loc='best', fontsize=12)
 
     # Включение сетки
     plt.grid(True, linestyle='--', alpha=0.7)
@@ -150,12 +165,12 @@ def plot_train(pretty_test=True):
     plt.plot(x, test_results, label='Тестовая', linestyle='--', color='red')
 
     # Настройка осей и заголовка
-    plt.xlabel('Номер эпохи', fontsize=12)
-    plt.ylabel('Коэффициент совпадения', fontsize=12)
-    # plt.title('Пример четырех графиков', fontsize=14)
+    plt.xlabel('Номер эпохи', fontsize=16)
+    plt.ylabel('Коэффициент совпадения', fontsize=16)
+    # plt.title('Пример четырех графиков', fontsize=16)
 
     # Добавление легенды
-    plt.legend(loc='best', fontsize=10)
+    plt.legend(loc='best', fontsize=12)
 
     # Включение сетки
     plt.grid(True, linestyle='--', alpha=0.7)
@@ -206,12 +221,12 @@ def plot_model_different_sizes(filepath, plot_test=False, pretty_test=True):
                  linestyle='-', color=possible_colors[i])
 
     # Настройка осей и заголовка
-    plt.xlabel('Номер эпохи', fontsize=12)
-    plt.ylabel('Коэффициент совпадения', fontsize=12)
-    # plt.title('Пример четырех графиков', fontsize=14)
+    plt.xlabel('Номер эпохи', fontsize=16)
+    plt.ylabel('Коэффициент совпадения', fontsize=16)
+    # plt.title('Пример четырех графиков', fontsize=16)
 
     # Добавление легенды
-    plt.legend(loc='best', fontsize=10)
+    plt.legend(loc='best', fontsize=12)
 
     # Включение сетки
     plt.grid(True, linestyle='--', alpha=0.7)
@@ -223,5 +238,6 @@ def plot_model_different_sizes(filepath, plot_test=False, pretty_test=True):
 if __name__ == "__main__":
     # plot_model_different_sizes("buf_sizes_results", True)
     # plot_model_different_sizes("train_sizes_res.txt", True)
-    plot_hits()
+    # plot_hits()
     # plot_train()
+    plot_matches()
